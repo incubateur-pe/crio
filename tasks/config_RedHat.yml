@@ -1,0 +1,25 @@
+---
+- name: "Configure yum stable repository"
+  get_url:
+    url: "{{ crio_repository_base_url }}/repositories/devel:/kubic:/libcontainers:/stable/{{ ansible_distribution }}_{{ ansible_distribution_major_version }}/devel:kubic:libcontainers:stable.repo"
+    dest: '/etc/yum.repos.d/devel:kubic:libcontainers:stable.repo'
+    owner: root
+    group: root
+    mode: 0644
+
+- name: "Configure yum cri-o repository"
+  get_url:
+    url: "{{ crio_repository_base_url }}/repositories/devel:kubic:libcontainers:stable:cri-o:{{ crio_version }}/{{ ansible_distribution }}_{{ ansible_distribution_major_version }}/devel:kubic:libcontainers:stable:cri-o:{{ crio_version }}.repo"
+    dest: '/etc/yum.repos.d/devel:kubic:libcontainers:stable:cri-o:{{ crio_version }}.repo'
+    owner: root
+    group: root
+    mode: 0644
+
+- name: "Set baseUrl for crio repositories"
+  replace:
+    path: "/etc/yum.repos.d/{{ item }}"
+    regexp: '^baseurl=https://download.opensuse.org/(.*)$'
+    replace: 'baseurl={{ crio_repository_base_url | regex_replace("/$", "") }}/\1'
+  with_items:
+    - "devel:kubic:libcontainers:stable.repo"
+    - "devel:kubic:libcontainers:stable:cri-o:{{ crio_version }}.repo"
