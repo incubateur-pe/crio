@@ -3,3 +3,7 @@ crio_version: 1.19
 crio_repository_base_url: https://download.opensuse.org
 podman_enabled: true
 podman_docker_enabled: true
+crio_unqualified_search_registries:
+  - docker.io
+crio_registries: []
+crio_mirrors: []
