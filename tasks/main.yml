@@ -29,6 +29,14 @@
     state: present
   when: podman_docker_enabled
 
+- name: "Disable podman docker warning"
+  copy:
+    content: ""
+    dest: /etc/containers/nodocker
+    force: no
+    mode: 0644
+  when: podman_docker_enabled and podman_docker_no_warning
+
 - name: "Configure cri-o registries"
   template:
     src: registries.conf.j2
