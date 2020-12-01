@@ -1,38 +1,65 @@
-Role Name
+![pipeline_status](https://gitlab.com/incubateur-pe/crio/badges/dev/pipeline.svg)
+
+crio
 =========
 
-A brief description of the role goes here.
-
-Requirements
-------------
-
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+Install and configure crio
 
 Role Variables
 --------------
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
-
-Dependencies
-------------
-
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+| Nom | valeur par defaut | description |
+|-----|-------------------|-------------|
+| crio_version | 1.19 | cri-o version to install |
+| crio_repository_base_url | https://download.opensuse.org | repository base url |
+| podman_enabled | true | Controls podman installation |
+| podman_docker_enabled | true | Installs docker emulation |
+| podman_docker_no_warning | false | Remove warning when running "docker" commands |
+| crio_unqualified_search_registries | ["docker.io"] | Repositories to search when using unqualified search like `busybox:latest` |
+| crio_registries | [] | registries, see https://www.mankier.com/5/containers-registries.conf |
+| crio_mirrors | [] | mirror, see https://www.mankier.com/5/containers-registries.conf |
+| crio_runroot | /var/run/containers/storage | see https://www.mankier.com/5/containers-storage.conf |
+| crio_graphroot | /var/run/containers/storage | see https://www.mankier.com/5/containers-storage.conf |
+| crio_storage_driver | overlay | see  https://www.mankier.com/5/containers-storage.conf |
 
 Example Playbook
 ----------------
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
+Simple crio install:
 
-    - hosts: servers
-      roles:
-         - { role: username.rolename, x: 42 }
+```yaml
+- hosts: all
+  roles:
+  - role: 'crio'
+```
+
+Registry configuration example :
+
+```yaml
+- hosts: all
+  tasks:
+    roles:
+    - role: "crio"
+  vars:
+    crio_registries:
+      - prefix: quay.io
+        insecure: true
+        blocked: false
+        location: local_registry:5002
+      - prefix: k8s.gcr.io
+        insecure: true
+        location: local_registry:5001
+      - prefix: docker.io
+        insecure: true
+        location: local_registry:5000
+```
+
+Tests
+-----
+
+See tests.md
 
 License
 -------
 
-BSD
-
-Author Information
-------------------
-
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+BSD 3-Clause
