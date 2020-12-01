@@ -6,6 +6,7 @@
       include_role:
         name: "crio"
       vars:
+        crio_repository_base_url: "{{ lookup('env', 'CRIO_REPOSITORY_BASE_URL') }}"
         crio_registries:
           - prefix: quay.io
             insecure: true
