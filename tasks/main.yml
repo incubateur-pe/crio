@@ -28,3 +28,9 @@
     name: podman-docker
     state: present
   when: podman_docker_enabled
+
+- name: "Configure cri-o registries"
+  template:
+    src: registries.conf.j2
+    dest: /etc/containers/registries.conf
+    mode: 0755
