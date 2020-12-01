@@ -1,2 +1,5 @@
 ---
-# handlers file for crio
+- name: "restart crio"
+  systemd:
+    name: crio
+    state: restarted
