@@ -44,6 +44,33 @@
     mode: 0755
   notify: restart crio
 
+- name: Configure storage driver
+  ini_file:
+    dest: '/etc/containers/storage.conf'
+    section: storage
+    option: driver
+    value: '"{{ crio_storage_driver }}"'
+    mode: 0644
+  notify: restart crio
+
+- name: Configure storage runroot
+  ini_file:
+    dest: '/etc/containers/storage.conf'
+    section: storage
+    option: runroot
+    value: '"{{ crio_runroot }}"'
+    mode: 0644
+  notify: restart crio
+
+- name: Configure storage graphroot
+  ini_file:
+    dest: '/etc/containers/storage.conf'
+    section: storage
+    option: graphroot
+    value: '"{{ crio_graphroot }}"'
+    mode: 0644
+  notify: restart crio
+
 - meta: flush_handlers
 
 - name: "Ensure cri-o service is started and enabled"
