@@ -1,0 +1,30 @@
+---
+- name: "Set up package manager for {{ ansible_os_family }}"
+  include_tasks: "config_{{ ansible_os_family }}.yml"
+  when: ansible_distribution != "Fedora"
+
+- name: "Enable cri-o module"
+  command: "dnf module enable -y cri-o:{{ crio_version }}"
+  args:
+    warn: false  # As of ansible 2.9, this is the only way to enable a dnf module...
+  register: result
+  changed_when:
+    - '"Enabling module streams" in result.stdout'
+  when: ansible_distribution == "Fedora"
+
+- name: "Install cri-o"
+  package:
+    name: cri-o
+    state: present
+
+- name: "Install podman"
+  package:
+    name: podman
+    state: present
+  when: podman_enabled
+
+- name: "Install podman-docker"
+  package:
+    name: podman-docker
+    state: present
+  when: podman_docker_enabled
