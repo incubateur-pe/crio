@@ -1,4 +1,8 @@
 ---
+- name: "Remove (if any) trailing slash in repository url"
+  set_fact:
+    crio_repository_base_url_noslash: '{{ crio_repository_base_url | regex_replace("/$", "") }}'
+
 - name: "Set up package manager for {{ ansible_os_family }}"
   include_tasks: "config_{{ ansible_os_family }}.yml"
   when: ansible_distribution != "Fedora"
@@ -14,8 +18,16 @@
 
 - name: "Install cri-o"
   package:
-    name: cri-o
+    name:
+      - cri-o
+      - conntrack
     state: present
+
+- name: "Install cri-o-runc"
+  package:
+    name: cri-o-runc
+    state: present
+  when: ansible_os_family == "Debian"
 
 - name: "Install podman"
   package:
@@ -27,7 +39,7 @@
   package:
     name: podman-docker
     state: present
-  when: podman_docker_enabled
+  when: podman_docker_enabled and ansible_os_family != "Debian"
 
 - name: "Disable podman docker warning"
   copy:
@@ -35,7 +47,7 @@
     dest: /etc/containers/nodocker
     force: no
     mode: 0644
-  when: podman_docker_enabled and podman_docker_no_warning
+  when: podman_docker_enabled and podman_docker_no_warning and ansible_os_family != "Debian"
 
 - name: "Configure cri-o registries"
   template:
