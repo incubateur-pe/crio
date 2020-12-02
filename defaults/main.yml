@@ -1,6 +1,7 @@
 ---
 crio_version: 1.19
 crio_repository_base_url: https://download.opensuse.org
+crio_repository_debian_key_base_url: https://download.opensuse.org
 podman_enabled: true
 podman_docker_enabled: true
 podman_docker_no_warning: false

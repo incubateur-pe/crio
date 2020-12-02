@@ -1,2 +1,23 @@
 ---
-- fail: msg="Not implemented yet"
+- name: "Set OS name fact for cri-o repository"
+  set_fact:
+    crio_os: "x{{ ansible_distribution }}_{{ ansible_distribution_version }}"
+
+- name: "Add cri-o apt key"
+  apt_key:
+    url: "{{ item }}"
+    state: present
+  with_items:
+    - "{{ crio_repository_debian_key_base_url }}/repositories/devel:kubic:libcontainers:stable:cri-o:{{ crio_version }}/{{ crio_os }}/Release.key"
+    - "{{ crio_repository_debian_key_base_url }}/repositories/devel:/kubic:/libcontainers:/stable/{{ crio_os }}/Release.key"
+
+- name: "Add cri-o repositories"
+  apt_repository:
+    repo: "deb {{ item.url }} /"
+    filename: "{{ item.name }}"
+    state: present
+  with_items:
+    - name: devel:kubic:libcontainers:stable.list
+      url: "{{ crio_repository_base_url_noslash }}/repositories/devel:/kubic:/libcontainers:/stable/{{ crio_os }}/"
+    - name: "devel:kubic:libcontainers:stable:cri-o:{{ crio_version }}.list"
+      url: "{{ crio_repository_base_url_noslash }}/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/{{ crio_version }}/{{ crio_os }}/"
