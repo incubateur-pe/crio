@@ -6,15 +6,8 @@ driver:
   provider:
     name: libvirt
 platforms:
-  - name: fedora
-    box: fedora/32-cloud-base
-    memory: 1024
-    cpus: 1
-    provider_options:
-      connect_via_ssh: ${REMOTE_HOST:-false}
-    provider_raw_config_args: ${PROVIDER_ARGS:-"[]"}
-  - name: centos7
-    box: centos/7
+  - name: ubuntu
+    box: generic/ubuntu1804
     memory: 1024
     cpus: 1
     provider_options:
