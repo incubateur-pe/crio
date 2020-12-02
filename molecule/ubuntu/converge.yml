@@ -1,0 +1,27 @@
+---
+- name: Converge
+  hosts: all
+  tasks:
+    - name: "Include crio"
+      include_role:
+        name: "crio"
+      vars:
+        crio_repository_base_url: "{{ lookup('env', 'CRIO_REPOSITORY_BASE_URL') }}"
+        crio_registries:
+          - prefix: quay.io
+            insecure: true
+            blocked: false
+            location: 10.0.4.40:5002
+          - prefix: k8s.gcr.io
+            insecure: true
+            location: 10.0.4.40:5001
+          - prefix: docker.io
+            insecure: true
+            location: 10.0.4.40:5000
+  environment:
+    http_proxy: "{{ lookup('env', 'http_proxy') }}"
+    https_proxy: "{{ lookup('env', 'http_proxy') }}"
+    HTTP_PROXY: "{{ lookup('env', 'HTTP_PROXY') }}"
+    HTTPS_PROXY: "{{ lookup('env', 'HTTPS_PROXY') }}"
+    no_proxy: "{{ lookup('env', 'no_proxy') }}"
+    NO_PROXY: "{{ lookup('env', 'NO_PROXY') }}"
