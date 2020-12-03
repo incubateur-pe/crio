@@ -9,6 +9,6 @@ crio_unqualified_search_registries:
   - docker.io
 crio_registries: []
 crio_mirrors: []
-crio_runroot: /var/run/containers/storage
-crio_graphroot: /var/run/containers/storage
-crio_storage_driver: overlay
+crio_config: []
+crio_storage: []
+crio_fedora_cgroup_version: v2

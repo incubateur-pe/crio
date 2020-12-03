@@ -1,0 +1,35 @@
+---
+- name: "Disable podman docker warning"
+  copy:
+    content: ""
+    dest: /etc/containers/nodocker
+    force: no
+    mode: 0644
+  when: podman_docker_enabled and podman_docker_no_warning and ansible_os_family != "Debian"
+
+- name: "Configure cri-o registries"
+  template:
+    src: registries.conf.j2
+    dest: /etc/containers/registries.conf
+    mode: 0755
+  notify: restart crio
+
+- name: "Configure storage"
+  ini_file:
+    dest: '/etc/containers/storage.conf'
+    section: '{{ item.section }}'
+    option: '{{ item.option }}'
+    value: '"{{ item.value }}"'
+    mode: 0644
+  with_items: "{{ crio_storage }}"
+  notify: restart crio
+
+- name: "Configure cri-o"
+  ini_file:
+    dest: '/etc/crio/crio.conf'
+    section: '{{ item.section }}'
+    option: '{{ item.option }}'
+    value: '"{{ item.value }}"'
+    mode: 0644
+  with_items: "{{ crio_config }}"
+  notify: restart crio
