@@ -30,7 +30,7 @@ provisioner:
   lint:
     name: ansible-lint
 scenario:
-  name: default
+  name: ubuntu
 verifier:
   name: testinfra
   options:
