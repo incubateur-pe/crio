@@ -7,13 +7,8 @@
   include_tasks: "config_{{ ansible_os_family }}.yml"
   when: ansible_distribution != "Fedora"
 
-- name: "Enable cri-o module"
-  command: "dnf module enable -y cri-o:{{ crio_version }}"
-  args:
-    warn: false  # As of ansible 2.9, this is the only way to enable a dnf module...
-  register: result
-  changed_when:
-    - '"Enabling module streams" in result.stdout'
+- name: "Set up Fedora specifics"
+  include_tasks: config_Fedora.yml
   when: ansible_distribution == "Fedora"
 
 - name: "Install cri-o"
@@ -41,47 +36,8 @@
     state: present
   when: podman_docker_enabled and ansible_os_family != "Debian"
 
-- name: "Disable podman docker warning"
-  copy:
-    content: ""
-    dest: /etc/containers/nodocker
-    force: no
-    mode: 0644
-  when: podman_docker_enabled and podman_docker_no_warning and ansible_os_family != "Debian"
-
-- name: "Configure cri-o registries"
-  template:
-    src: registries.conf.j2
-    dest: /etc/containers/registries.conf
-    mode: 0755
-  notify: restart crio
-
-- name: Configure storage driver
-  ini_file:
-    dest: '/etc/containers/storage.conf'
-    section: storage
-    option: driver
-    value: '"{{ crio_storage_driver }}"'
-    mode: 0644
-  notify: restart crio
-
-- name: Configure storage runroot
-  ini_file:
-    dest: '/etc/containers/storage.conf'
-    section: storage
-    option: runroot
-    value: '"{{ crio_runroot }}"'
-    mode: 0644
-  notify: restart crio
-
-- name: Configure storage graphroot
-  ini_file:
-    dest: '/etc/containers/storage.conf'
-    section: storage
-    option: graphroot
-    value: '"{{ crio_graphroot }}"'
-    mode: 0644
-  notify: restart crio
+- name: "Configure cri-o"
+  include_tasks: configure_crio.yml
 
 - meta: flush_handlers
 

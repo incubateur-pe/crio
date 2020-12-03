@@ -18,8 +18,8 @@ Role Variables
 | crio_unqualified_search_registries | ["docker.io"] | Repositories to search when using unqualified search like `busybox:latest` |
 | crio_registries | [] | registries, see https://www.mankier.com/5/containers-registries.conf |
 | crio_mirrors | [] | mirror, see https://www.mankier.com/5/containers-registries.conf |
-| crio_runroot | /var/run/containers/storage | see https://www.mankier.com/5/containers-storage.conf |
-| crio_graphroot | /var/run/containers/storage | see https://www.mankier.com/5/containers-storage.conf |
+| crio_config | [] | Crio configuration, as a table of objects containing section, option and value. See https://github.com/cri-o/cri-o/blob/master/docs/crio.conf.5.md |
+| crio_storage | [] | Storage configuration, as a table of objects containing section, option and value. see https://www.mankier.com/5/containers-storage.conf |
 | crio_storage_driver | overlay | see  https://www.mankier.com/5/containers-storage.conf |
 
 Example Playbook

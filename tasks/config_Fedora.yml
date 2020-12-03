@@ -1,0 +1,46 @@
+---
+- name: "Enable cri-o module"
+  command: "dnf module enable -y cri-o:{{ crio_version }}"
+  args:
+    warn: false  # As of ansible 2.9, this is the only way to enable a dnf module...
+  register: result
+  changed_when:
+    - '"Enabling module streams" in result.stdout'
+
+- name: "Configure cri-o to use cgroups v1 on Fedora >= 31"
+  block:
+  - name: "Check if cgroupsV1 are currently in use"
+    command: 'grep unified_cgroup_hierarchy=0 /boot/grub2/grubenv'
+    register: cgroupV1_config
+    failed_when: false
+    changed_when: false
+
+  - name: "Configure cgroupsV1 on fedora >= 31"
+    command: 'grubby --update-kernel=ALL --args="systemd.unified_cgroup_hierarchy=0"'
+    when: cgroupV1_config.stdout_lines|length != 1
+
+  - name: "Reboot for cgroup change"
+    reboot:
+    when: cgroupV1_config.stdout_lines|length != 1
+  when: ansible_distribution_version|int >= 31 and crio_fedora_cgroup_version == "v1"
+
+- name: "cgroups V2 config for Fedora >= 31"
+  block:
+  - name: "Add crun configuration for cgroups v2 on Fedora"
+    set_fact:
+      cgroups_config:
+        - section: crio.runtime
+          option: default_runtime
+          value: crun
+        - section: crio.runtime.runtimes.crun
+          option: runtime_type
+          value: oci
+        - section: crio.runtime.runtimes.crun
+          option: runtime_root
+          value: /run/crun
+
+  - name: "Merge crun config with crio config"
+    set_fact:
+      crio_config: "{{ crio_config + cgroups_config }}"
+
+  when: ansible_distribution_version|int >= 31 and crio_fedora_cgroup_version == "v2"
